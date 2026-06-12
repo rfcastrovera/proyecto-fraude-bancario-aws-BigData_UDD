@@ -1,0 +1,42 @@
+==========================================================================================
+DIAGRAMA DE LINAJE DE DATOS (DATA LINEAGE) - AWS CLOUD CONFIGURATION
+MDS UDD 2026 - Big Data y Cloud Computing - Adrián y Ricardo
+==========================================================================================
+
+[GENERACIÓN SINTÉTICA REPLICA (Estrategia C)]
+  │
+  │  (Procesamiento paralelo nativo vía clúster Amazon EMR / Spark Engines)
+  ▼
+[CAPA BRONCE: s3://banco-data-bronze/transactions/]
+  │  - Formato físico subyacente: Delta Lake (Parquet comprimido + Transaction Log)
+  │  - Estructura: [transaction_id, user_id, card_number, amount, merchant_category, transaction_date, is_fraud_suspect]
+  │  - Políticas AWS IAM: Solo accesible por la Cuenta de Servicio del pipeline.
+  │
+  │
+  │  OPERACIÓN DE REFINAMIENTO Y CUMPLIMIENTO REGULATORIO PCI-DSS
+  │  - Limpieza de Calidad: Exclusión de registros erróneos (amount <= 0).
+  │  - Regla de Anonimización: Enmascaramiento irreversible de números de tarjeta de crédito.
+  │    Fórmula: regexp_replace(card_number, r"^(\d{4})\d{8}(\d{4})$", "$1-XXXX-XXXX-$2")
+  │    La columna cruda 'card_number' es ELIMINADA para garantizar seguridad corporativa.
+  │
+  ▼
+[CAPA PLATA: s3://banco-data-silver/transactions/]
+  │  - Formato físico subyacente: Delta Lake
+  │  - Estructura segura: [transaction_id, user_id, amount, merchant_category, transaction_date, is_fraud_suspect, card_number_masked]
+  │  - Uso: Listo para ser consumido de manera segura por algoritmos de Machine Learning (Amazon SageMaker).
+  │
+  │
+  │  OPERACIÓN DE AGREGACIÓN ANALÍTICA DE NEGOCIO (FEATURE ENGINEERING)
+  │  - Agrupación Clave: groupBy("user_id", "transaction_date")
+  │  - Métricas: sum("amount") -> total_monto_diario
+  │              count("transaction_id") -> cantidad_transacciones_diarias
+  │              max("is_fraud_suspect") -> contiene_sospecha_fraude
+  │  - Criterio de Riesgo: Creación de flag si se superan las 12 transacciones diarias en un mismo día.
+  │
+  ▼
+[CAPA ORO: s3://banco-data-gold/user_daily_features/]
+     - Formato físico subyacente: Delta Lake
+     - Estructura consolidada: [user_id, transaction_date, total_monto_diario, cantidad_transacciones_diarias, contiene_sospecha_fraude, perfil_alto_riesgo]
+     - ESTRATEGIA DE OPTIMIZACIÓN CLOUD: Particionado en buckets por campo lógico 'transaction_date'.
+     - Beneficio AWS: Reduce dramáticamente los costos de escaneo de datos en Amazon Athena y Amazon QuickSight.
+==========================================================================================
