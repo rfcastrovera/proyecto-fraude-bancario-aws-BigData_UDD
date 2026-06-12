@@ -1,7 +1,7 @@
 # Pipeline de Detección de Fraude en Tarjetas de Crédito (Sector Financiero) - AWS Architecture
 ## MDS UDD 2026 - Big Data y Cloud Computing
 **Profesor:** Luis Castillo Faune  
-**Integrantes del Equipo:** Adrián y Ricardo  
+**Integrantes del Equipo:** Adrián Espinoza A.- Ricardo Castro V.  
 **Hito:** Fase 2 - Implementación y Optimización  
 **Fecha de Entrega:** 12 de junio de 2026  
 
