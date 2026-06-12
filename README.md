@@ -44,8 +44,8 @@ proyecto-fraude-bancario-aws/
 ### Ejecución
 1. Clone el repositorio en su espacio de trabajo de desarrollo:
    ```bash
-   git clone https://github.com/adrian-ricardo/proyecto-fraude-bancario-aws.git
-   cd proyecto-fraude-bancario-aws
+   git clone https://github.com/adrian-ricardo/proyecto-fraude-bancario-aws.git](https://github.com/rfcastrovera/proyecto-fraude-bancario-aws-BigData_UDD.git
+   cd proyecto-fraude-bancario-aws-BigData_UDD
    ```
 2. Instale los binarios necesarios del ecosistema Spark:
    ```bash
@@ -98,8 +98,10 @@ El linaje detallado paso a paso se describe formalmente en `docs/lineage_diagram
 Utilizando la calculadora oficial de AWS (**AWS Pricing Calculator**), estimamos el costo financiero mensual para la operación de este pipeline de fraude bancario a escala de producción:
 
 ### Configuración del Cómputo: Amazon EMR (Elastic MapReduce) Cluster
-- **1 Nodo Master:** `m5.xlarge` (4 vCPUs, 16 GB RAM) $ightarrow$ Costo base EC2 + EMR: ~$0.248 USD/hora.
-- **2 Nodos Workers:** `m5.xlarge` (4 vCPUs, 16 GB RAM c/u) $ightarrow$ Costo base EC2 + EMR: ~$0.496 USD/hora combinados.
+- **1 Nodo Master:** `m5.xlarge` (4 vCPUs, 16 GB RAM) $
+ightarrow$ Costo base EC2 + EMR: ~$0.248 USD/hora.
+- **2 Nodos Workers:** `m5.xlarge` (4 vCPUs, 16 GB RAM c/u) $
+ightarrow$ Costo base EC2 + EMR: ~$0.496 USD/hora combinados.
 - **Estrategia Operativa:** Clúster Efímero (se crea automáticamente vía orquestador, procesa el lote diario de 2 millones de filas en ~30 minutos y se autodestruye).
 
 ### Desglose Mensual de Costos (USD)
