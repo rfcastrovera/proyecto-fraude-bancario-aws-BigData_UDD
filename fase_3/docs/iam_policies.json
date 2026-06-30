@@ -1,0 +1,118 @@
+{
+  "policies": [
+    {
+      "name": "GlueJobExecutionRole",
+      "description": "Rol de ejecución para los jobs de Glue (ingestion y transformations). Otorga acceso de lectura a la fuente y escritura al datalake.",
+      "trust_policy": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": { "Service": "glue.amazonaws.com" },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "permissions": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "ReadSourceAndScripts",
+            "Effect": "Allow",
+            "Action": ["s3:GetObject", "s3:ListBucket"],
+            "Resource": [
+              "arn:aws:s3:::bucket-origen-adrianespinoza",
+              "arn:aws:s3:::bucket-origen-adrianespinoza/*"
+            ]
+          },
+          {
+            "Sid": "FullAccessDatalake",
+            "Effect": "Allow",
+            "Action": ["s3:*"],
+            "Resource": [
+              "arn:aws:s3:::datalake-adrianespinoza",
+              "arn:aws:s3:::datalake-adrianespinoza/*"
+            ]
+          },
+          {
+            "Sid": "GlueJobLogs",
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:/aws-glue/*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AthenaQueryRole",
+      "description": "Rol de solo lectura para consultar el datalake vía Athena (capa Gold principalmente).",
+      "trust_policy": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": { "Service": "athena.amazonaws.com" },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "permissions": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "ReadGold",
+            "Effect": "Allow",
+            "Action": ["s3:GetObject", "s3:ListBucket"],
+            "Resource": [
+              "arn:aws:s3:::datalake-adrianespinoza",
+              "arn:aws:s3:::datalake-adrianespinoza/gold/*"
+            ]
+          },
+          {
+            "Sid": "ReadGlueCatalog",
+            "Effect": "Allow",
+            "Action": [
+              "glue:GetDatabase",
+              "glue:GetDatabases",
+              "glue:GetTable",
+              "glue:GetTables"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Sid": "AthenaQueryResults",
+            "Effect": "Allow",
+            "Action": ["s3:PutObject"],
+            "Resource": "arn:aws:s3:::aws-athena-query-results-*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "S3BucketPolicy_Datalake",
+      "description": "Política de bucket S3 para el datalake: bloquea acceso público y exige SSL.",
+      "policy": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "DenyPublicAccess",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": [
+              "arn:aws:s3:::datalake-adrianespinoza",
+              "arn:aws:s3:::datalake-adrianespinoza/*"
+            ],
+            "Condition": {
+              "Bool": { "aws:SecureTransport": "false" }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
